@@ -1,0 +1,43 @@
+version: '3.1'
+services:
+
+  consumer-service:
+    build:
+      context: .
+      dockerfile: ./consumer-service/Dockerfile
+    image: consumer-service
+    container_name: consumer_service_module
+    ports:
+      - "8080:8080"
+    depends_on:
+      - supplier-service
+    environment:
+      - SERVER_PORT=8080
+      - CONSUMER_SERVER_URL=http://supplier-service:5050
+
+  supplier-service:
+    build:
+      context: .
+      dockerfile: ./supplier-service/Dockerfile
+    image: supplier-service
+    container_name: supplier_service_module
+    ports:
+      - "5050:5050"
+    depends_on:
+      - t1hw-db
+    environment:
+      - SERVER_PORT=5050
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://t1hw-db:5432/t1_hw_1
+      - SPRING_DATASOURCE_USERNAME=masfuj
+      - SPRING_DATASOURCE_PASSWORD=jfejfe11
+
+  t1hw-db:
+    image: postgres:15.3-alpine
+    container_name: t1hw-db
+    ports:
+      - "6542:5432"
+    environment:
+      - POSTGRES_DB=t1_hw_1
+      - POSTGRES_USER=masfuj
+      - POSTGRES_PASSWORD=jfejfe11
+      - JAVA_TOOL_OPTIONS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
